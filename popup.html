@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
+  <title>Mono Poser</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="panel">
+    <header class="head">
+      <svg class="mark" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M2.2 12a5.8 5.8 0 0 1 11.6 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8" cy="6.2" r="1.7" fill="currentColor"/>
+      </svg>
+      <h1>Mono Poser</h1>
+      <span class="status" id="status" hidden><span class="dot"></span>Live</span>
+    </header>
+
+    <p class="tabline" id="tabline">This tab</p>
+
+    <section id="idle">
+      <p class="lede">Fold this tab’s stereo into one signal, in both ears.</p>
+      <button class="primary" id="start" type="button">Start mono</button>
+      <p class="error" id="error" role="alert" hidden></p>
+    </section>
+
+    <section id="live" hidden>
+      <div class="dial">
+        <button class="side" id="left" type="button" title="Copy the left channel into both ears">Left</button>
+        <div class="gauge" id="gauge" aria-label="Channel blend"></div>
+        <button class="side" id="right" type="button" title="Copy the right channel into both ears">Right</button>
+      </div>
+      <p class="hint">Left or Right plays that channel in both ears.</p>
+      <div class="boost">
+        <div class="boost-head">
+          <label for="boost">Boost</label>
+          <output id="boostValue" for="boost">100%</output>
+        </div>
+        <input id="boost" type="range" min="100" max="400" step="10" value="100">
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span class="note" id="note">Only this tab is affected.</span>
+      <button class="link" id="stop" type="button" hidden>Stop</button>
+    </footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
