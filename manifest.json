@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Mono Poser",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fold a tab's stereo audio into mono. Copy either channel into both ears, or blend between them with a dial.",
   "minimum_chrome_version": "116",
   "permissions": ["tabCapture", "offscreen", "storage", "activeTab"],

@@ -4,7 +4,7 @@ A dependency-free Brave / Chromium extension that folds the current tab's stereo
 audio into mono. Pick a channel with the two buttons, blend between them on the
 half-circle dial, and push the level with the boost slider.
 
-Source size: about 31 KB (plus 11 KB of PNG icons). No libraries, no build step,
+Source size: about 34 KB (plus 8 KB of PNG icons). No libraries, no build step,
 no network code, no content scripts.
 
 ## Install
@@ -116,3 +116,13 @@ icons/             SVG source + 16/32/48/128 PNGs
   milliseconds of latency. Stop restores direct playback.
 * The limiter keeps boosted peaks under control, but very high boost settings
   compress peaks (reduce dynamics) instead of letting them clip.
+
+## License
+
+Mono Poser is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, version 3 only.
+
+See [LICENSE](LICENSE).
+
+Copyright © 2026 haluked.

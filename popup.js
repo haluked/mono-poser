@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-only */
 'use strict';
 
 (() => {
@@ -26,6 +27,7 @@
     host.setAttribute('role', 'slider');
     host.setAttribute('aria-valuemin', '-100');
     host.setAttribute('aria-valuemax', '100');
+    host.replaceChildren();
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 148 88');
@@ -33,6 +35,7 @@
     svg.innerHTML =
       `<path class="track" d="${ARC}"/>` +
       `<path class="fill" d="${ARC}" pathLength="100" stroke-dasharray="100" stroke-dashoffset="50"/>` +
+      `<line class="tick tick--center" x1="74" y1="30" x2="74" y2="22"/>` +
       `<g class="knob-group"><circle class="knob-halo" r="9"/><circle class="knob" r="6"/></g>`;
     host.appendChild(svg);
 
@@ -53,6 +56,8 @@
       const y = CY + R * Math.sin(angle);
       knob.style.transform = `translate(${x.toFixed(2)}px,${y.toFixed(2)}px)`;
       fill.style.strokeDashoffset = (100 - ((value + 1) / 2) * 100).toFixed(2);
+      // A zero-length round cap renders as a stray dot at the far end.
+      fill.style.opacity = value <= -0.995 ? '0' : '1';
 
       const left = Math.round(((1 - value) / 2) * 100);
       const right = 100 - left;
@@ -68,6 +73,7 @@
         magnitude < 0.02 ? 'Mono, equal left and right' :
         magnitude > 0.98 ? `${value < 0 ? 'Left' : 'Right'} channel only, in both ears` :
         `${left}% left, ${right}% right`);
+      host.classList.toggle('is-mono', magnitude < 0.02);
     }
 
     function set(next, { animate = true, emit = false } = {}) {
@@ -213,6 +219,7 @@
     const input = $('boost');
     input.value = String(boost);
     input.style.setProperty('--pct', `${((boost - 100) / 300) * 100}%`);
+    input.style.setProperty('--level', ((boost - 100) / 300).toFixed(3));
     input.setAttribute('aria-valuetext', `${boost} percent`);
     $('boostValue').textContent = `${boost}%`;
     $('boostValue').classList.toggle('is-boosted', boost > 100);
@@ -254,7 +261,6 @@
     const live = state.running;
     $('idle').hidden = live;
     $('live').hidden = !live;
-    $('status').hidden = !live;
     $('stop').hidden = !live;
 
     if (live) {
@@ -262,13 +268,6 @@
       paintPressed(state.ratio);
       setBoostUI(state.boost, false);
     }
-
-    const other = live && tab && tab.id !== state.tabId;
-    const title = (live ? state.title : tab?.title) || '';
-    $('tabline').textContent = title
-      ? `${other ? 'Other tab' : 'This tab'} · ${title}`
-      : other ? 'Other tab' : 'This tab';
-    $('note').textContent = live ? 'Keeps playing if you close this.' : 'Only this tab is affected.';
   }
 
   /* -------------------------------------------------------------- actions -- */
