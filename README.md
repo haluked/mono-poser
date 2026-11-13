@@ -4,8 +4,13 @@ A dependency-free Brave / Chromium extension that folds the current tab's stereo
 audio into mono. Pick a channel with the two buttons, blend between them on the
 half-circle dial, and push the level with the boost slider.
 
-Source size: about 34 KB (plus 8 KB of PNG icons). No libraries, no build step,
-no network code, no content scripts.
+A separate Firefox build lives in `firefox/`. Firefox exposes no tab audio
+capture, so that build folds the page's `<audio>` / `<video>` elements instead.
+See [Firefox](#firefox) below.
+
+Source size: about 34 KB for the Chromium build (plus 8 KB of PNG icons) and
+about 20 KB for the Firefox build. No libraries, no build step, no network code.
+The Chromium build has no content scripts; the Firefox build uses one.
 
 ## Install
 
@@ -15,6 +20,20 @@ no network code, no content scripts.
 4. Pin Mono Poser to the toolbar.
 
 Requires Chromium 116+ (Brave is well past that).
+
+### Firefox
+
+Firefox cannot capture a tab's audio: it has no `tabCapture`, no offscreen
+documents, and no tab-audio sharing through `getDisplayMedia`. The Firefox build
+routes the page's media elements through the same Web Audio mono chain instead.
+
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on…** and pick `firefox/manifest.json`.
+
+For a signed permanent install, package the `firefox/` folder and submit it to
+addons.mozilla.org. The Gecko ID is `mono-poser@haluked.github.io`.
+
+Requires Firefox 140+ (142+ on Android).
 
 ## Use
 
@@ -65,6 +84,23 @@ The offscreen document is created with the `USER_MEDIA` reason, which has no
 lifetime cap. It is closed on Stop, so it does not sit in memory between uses.
 The service worker sleeps normally; state lives in `chrome.storage.session`.
 
+### Firefox build
+
+```
+popup  ── message ──►  content script in the page
+                            │
+                <audio> / <video> ─► MediaElementAudioSourceNode
+                            │
+                    splitter ─► gainL ─┐
+                                       ├─► merger ─► boost ─► limiter ─► speakers
+                    splitter ─► gainR ─┘
+```
+
+The content script owns the `AudioContext`, so audio keeps playing while the
+popup is closed. Stop reconnects every media source directly to the destination.
+There is no background page or offscreen document. If Firefox blocks the
+AudioContext, the popup asks for one click on the recording, then Start again.
+
 ## Why not WebAssembly
 
 This workload is four multiply-adds per sample. `ChannelSplitterNode`,
@@ -94,14 +130,18 @@ WASM if profiling says so.
 
 No host permissions, no content scripts, no analytics, no network requests.
 
+The Firefox build uses `activeTab`, `scripting`, and `storage` only. Its content
+script is injected on demand and reads media elements only to route their audio.
+
 ## Files
 
 ```
-manifest.json      extension manifest (MV3)
+manifest.json      Chromium manifest (MV3)
 background.js      session, stream ID, lifecycle
-offscreen.html/js  the audio engine
+offscreen.html/js  the Chromium audio engine
 popup.html/css/js  the panel: dial, boost, buttons, state
 icons/             SVG source + 16/32/48/128 PNGs
+firefox/           Firefox MV3 build (content-script media capture)
 ```
 
 ## Limits
@@ -116,6 +156,16 @@ icons/             SVG source + 16/32/48/128 PNGs
   milliseconds of latency. Stop restores direct playback.
 * The limiter keeps boosted peaks under control, but very high boost settings
   compress peaks (reduce dynamics) instead of letting them clip.
+
+### Firefox build
+
+* It folds the page's `<audio>` and `<video>` elements. It cannot capture audio
+  generated only by Web Audio, a cross-origin iframe player, DRM-protected media,
+  or a muted element.
+* The media must be playing; if the AudioContext is blocked, click the recording
+  once and press Start again.
+* Open shadow roots and same-origin iframes are scanned; closed shadow roots and
+  cross-origin frames are not.
 
 ## License
 

@@ -1,0 +1,49 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
+  <title>Mono Poser</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="panel">
+    <header class="head">
+      <svg class="mark" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M2.2 10a5.8 5.8 0 0 1 11.6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M8 5v2.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <h1>Mono Poser</h1>
+      <button class="link" id="stop" type="button" hidden><span class="stop-square" aria-hidden="true"></span>Stop</button>
+    </header>
+
+    <section id="idle">
+      <button class="primary" id="start" type="button">Start mono</button>
+      <p class="error" id="error" role="alert" hidden></p>
+    </section>
+
+    <section id="live" hidden>
+      <div class="dial">
+        <div class="gauge" id="gauge" aria-label="Channel blend"></div>
+        <button class="side" id="left" type="button" title="Copy the left channel into both ears">Left</button>
+        <button class="side" id="right" type="button" title="Copy the right channel into both ears">Right</button>
+      </div>
+
+      <div class="boost">
+        <div class="boost-head">
+          <label for="boost">Boost</label>
+          <output id="boostValue" for="boost">100%</output>
+        </div>
+
+        <input id="boost" type="range" min="100" max="400" step="10" value="100">
+
+        <div class="boost-scale" aria-hidden="true">
+          <span>100</span><span>200</span><span>300</span><span>400</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
